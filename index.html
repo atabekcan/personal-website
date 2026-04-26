@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atabek C. Yucel — AI Product Leader & Digital Health Executive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080c14;
+      --surface: #0f1520;
+      --surface2: #161d2e;
+      --border: rgba(255,255,255,0.07);
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --accent3: #34d399;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --card-bg: rgba(15,21,32,0.8);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%;
+      height: 64px;
+      background: rgba(8,12,20,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+    .nav-logo {
+      display: flex; align-items: center; text-decoration: none;
+      opacity: 1; transition: opacity 0.2s;
+    }
+    .nav-logo:hover { opacity: 0.75; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.875rem;
+      font-weight: 500; transition: color 0.2s; letter-spacing: 0.01em;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 100px 5% 60px;
+      position: relative; overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute; border-radius: 50%; filter: blur(120px); pointer-events: none;
+    }
+    .hero-glow-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(56,189,248,0.12) 0%, transparent 70%);
+      top: -100px; right: -100px;
+    }
+    .hero-glow-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(129,140,248,0.1) 0%, transparent 70%);
+      bottom: -50px; left: -100px;
+    }
+    .hero-inner { display: flex; align-items: center; gap: 5rem; width: 100%; position: relative; z-index: 1; }
+    .hero-content { flex: 1; min-width: 0; }
+
+    /* ─── HERO VISUAL ─── */
+    .hero-visual {
+      flex: 0 0 420px; height: 480px;
+      position: relative; display: flex; align-items: center; justify-content: center;
+    }
+    /* Orb */
+    .vis-orb {
+      width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle at 38% 38%, rgba(56,189,248,0.14) 0%, rgba(129,140,248,0.08) 55%, transparent 75%);
+      border: 1px solid rgba(56,189,248,0.1);
+      position: absolute;
+    }
+    .vis-orb::after {
+      content: '';
+      position: absolute; inset: -20px; border-radius: 50%;
+      border: 1px dashed rgba(56,189,248,0.12);
+      animation: slow-spin 22s linear infinite;
+    }
+    .vis-orb::before {
+      content: '';
+      position: absolute; inset: -44px; border-radius: 50%;
+      border: 1px dashed rgba(129,140,248,0.08);
+      animation: slow-spin 34s linear infinite reverse;
+    }
+    @keyframes slow-spin { to { transform: rotate(360deg); } }
+
+    /* Orbiting dots */
+    .vis-dot {
+      position: absolute; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 10px rgba(56,189,248,0.6);
+      animation: float-dot 6s ease-in-out infinite;
+    }
+    .vis-dot.d2 { width: 6px; height: 6px; background: var(--accent2); box-shadow: 0 0 10px rgba(129,140,248,0.6); animation-delay: -2s; animation-duration: 7s; }
+    .vis-dot.d3 { width: 5px; height: 5px; background: var(--accent3); box-shadow: 0 0 10px rgba(52,211,153,0.6); animation-delay: -4s; animation-duration: 5s; }
+    @keyframes float-dot { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+    /* Floating achievement cards */
+    .vis-card {
+      position: absolute; backdrop-filter: blur(12px);
+      background: rgba(15,21,32,0.85);
+      border: 1px solid rgba(56,189,248,0.15);
+      border-radius: 14px; padding: 0.875rem 1.1rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      white-space: nowrap; animation: float-card 5s ease-in-out infinite;
+    }
+    .vis-card.vc1 { top: 18px;  left: 0;    animation-delay: 0s;    animation-duration: 5.5s; }
+    .vis-card.vc2 { top: 48%;  right: -10px; animation-delay: -1.8s; animation-duration: 6s; }
+    .vis-card.vc3 { bottom: 30px; left: 20px; animation-delay: -3.2s; animation-duration: 5s; }
+    @keyframes float-card { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+    .vis-card-icon { font-size: 1.3rem; line-height: 1; }
+    .vis-card-text { }
+    .vis-card-label { font-size: 0.65rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
+    .vis-card-value { font-size: 0.875rem; font-weight: 700; color: var(--text); margin-top: 0.1rem; }
+    /* Glow under the orb */
+    .vis-glow {
+      position: absolute; width: 280px; height: 280px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);
+      filter: blur(30px); pointer-events: none;
+    }
+
+    @media (max-width: 1024px) { .hero-visual { display: none; } }
+    @media (max-width: 768px)  { .hero-inner { flex-direction: column; } }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.375rem 1rem;
+      background: rgba(56,189,248,0.1);
+      border: 1px solid rgba(56,189,248,0.2);
+      border-radius: 100px;
+      font-size: 0.8rem; font-weight: 500; color: var(--accent);
+      margin-bottom: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .hero-badge::before { content: '▸'; }
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.25rem;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--muted); margin-bottom: 1.5rem;
+      font-weight: 400;
+    }
+    .hero-desc {
+      font-size: 1.05rem; color: #94a3b8; max-width: 620px;
+      margin-bottom: 2.5rem; line-height: 1.75;
+    }
+    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.75rem; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      text-decoration: none; transition: all 0.25s; border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #000;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(56,189,248,0.3); }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+    .hero-stats {
+      display: flex; gap: 2.5rem; margin-top: 3.5rem;
+      padding-top: 2.5rem; border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .stat-item { }
+    .stat-num {
+      font-size: 2rem; font-weight: 800; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; margin-top: 0.125rem; }
+
+    /* ─── SECTION BASE ─── */
+    section { padding: 100px 5%; position: relative; }
+    .section-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem; color: var(--accent); font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 0.75rem; display: block;
+    }
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem;
+    }
+    .section-sub { color: var(--muted); font-size: 1rem; max-width: 560px; margin-bottom: 3.5rem; }
+
+    /* ─── PORTFOLIO ─── */
+    #portfolio { background: var(--surface); }
+    .portfolio-tabs {
+      display: flex; gap: 0.75rem; margin-bottom: 2.5rem; flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 0.5rem 1.25rem; border-radius: 8px; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); transition: all 0.2s;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: rgba(56,189,248,0.1);
+      border-color: rgba(56,189,248,0.3);
+      color: var(--accent);
+    }
+    .portfolio-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .portfolio-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.75rem;
+      transition: all 0.3s; cursor: pointer;
+      position: relative; overflow: hidden;
+    }
+    .portfolio-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(56,189,248,0.03), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .portfolio-card:hover { border-color: rgba(56,189,248,0.25); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .portfolio-card:hover::before { opacity: 1; }
+    .card-tag {
+      display: inline-block; padding: 0.25rem 0.75rem;
+      border-radius: 100px; font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+    .tag-vibe { background: rgba(56,189,248,0.1); color: var(--accent); border: 1px solid rgba(56,189,248,0.2); }
+    .tag-project { background: rgba(129,140,248,0.1); color: var(--accent2); border: 1px solid rgba(129,140,248,0.2); }
+    .tag-partnership { background: rgba(52,211,153,0.1); color: var(--accent3); border: 1px solid rgba(52,211,153,0.2); }
+    .tag-professional { background: rgba(52,211,153,0.1); color: var(--accent3); border: 1px solid rgba(52,211,153,0.2); }
+    .tag-board { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+    .card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+    .card-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.65; margin-bottom: 1.25rem; }
+    .card-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .card-tech {
+      font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 6px;
+      background: rgba(255,255,255,0.05); color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .card-link {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.8rem; color: var(--accent); text-decoration: none;
+      margin-top: 1rem; font-weight: 500; transition: gap 0.2s;
+    }
+    .card-link:hover { gap: 0.6rem; }
+
+    /* ─── EXPERIENCE ─── */
+    .timeline { position: relative; }
+    .timeline::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 1px; background: linear-gradient(to bottom, var(--accent), transparent);
+    }
+    .timeline-item {
+      padding-left: 2rem; margin-bottom: 3rem; position: relative;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute; left: -4px; top: 6px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.2);
+    }
+    .timeline-company {
+      font-size: 0.75rem; color: var(--accent); font-weight: 600;
+      letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.25rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .timeline-role { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; letter-spacing: -0.01em; }
+    .timeline-period { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem; }
+    .timeline-desc { font-size: 0.9rem; color: #94a3b8; line-height: 1.7; }
+
+    /* ─── SKILLS ─── */
+    #skills { background: var(--surface); }
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
+    .skill-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.5rem; transition: all 0.3s;
+    }
+    .skill-card:hover { border-color: rgba(56,189,248,0.2); transform: translateY(-2px); }
+    .skill-icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
+    .skill-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .skill-items { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .skill-item {
+      font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 6px;
+      background: rgba(255,255,255,0.05); color: var(--muted);
+    }
+
+    /* ─── EDUCATION ─── */
+    .edu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+    .edu-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.5rem; transition: all 0.3s;
+    }
+    .edu-card:hover { border-color: rgba(129,140,248,0.25); transform: translateY(-2px); }
+    .edu-school { font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .edu-degree { font-size: 0.85rem; color: var(--accent2); margin-bottom: 0.25rem; font-weight: 500; }
+    .edu-year { font-size: 0.78rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+    /* ─── CONTACT ─── */
+    #contact { background: var(--surface); text-align: center; }
+    .contact-card {
+      max-width: 600px; margin: 0 auto;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 20px; padding: 3rem;
+      position: relative; overflow: hidden;
+    }
+    .contact-card::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 60%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .contact-email {
+      font-size: 1.3rem; font-weight: 700; color: var(--text);
+      text-decoration: none; display: block; margin: 1.5rem 0;
+      transition: color 0.2s;
+    }
+    .contact-email:hover { color: var(--accent); }
+    .contact-links { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .contact-link {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1.25rem; border-radius: 10px;
+      border: 1px solid var(--border); color: var(--muted);
+      text-decoration: none; font-size: 0.85rem; font-weight: 500;
+      transition: all 0.2s;
+    }
+    .contact-link:hover { border-color: rgba(56,189,248,0.3); color: var(--accent); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 2rem 5%; text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 0.8rem;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    .fade-in {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 1.25rem; }
+      .nav-links { display: none; }
+      section { padding: 70px 1.25rem; }
+      .hero { padding: 100px 1.25rem 60px; }
+      .hero-stats { gap: 1.5rem; }
+      .contact-card { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#home" class="nav-logo" aria-label="Home">
+      <svg width="40" height="30" viewBox="0 0 40 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lg" x1="0" y1="0" x2="40" y2="30" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#38bdf8"/>
+            <stop offset="100%" stop-color="#818cf8"/>
+          </linearGradient>
+        </defs>
+        <rect x="0"  y="0"    width="40" height="8" rx="4" fill="url(#lg)"/>
+        <rect x="6"  y="11"   width="34" height="8" rx="4" fill="url(#lg)" opacity="0.6"/>
+        <rect x="13" y="22"   width="27" height="8" rx="4" fill="url(#lg)" opacity="0.3"/>
+      </svg>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#contact" class="btn btn-primary" style="padding:0.5rem 1.25rem; font-size:0.8rem;">Get in Touch</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-glow hero-glow-1"></div>
+    <div class="hero-glow hero-glow-2"></div>
+    <div class="hero-inner">
+    <div class="hero-content fade-in">
+      <div class="hero-badge" id="h-badge">Chief Product Officer · AI &amp; Digital Health</div>
+      <h1>Atabek C.<br /><span>Yucel</span></h1>
+      <p class="hero-sub" id="h-subtitle">Enterprise AI Strategy · Digital Health Transformation · Executive Leadership</p>
+      <p class="hero-desc" id="h-desc">
+        I operate at the CPO level — defining product vision, aligning organizations, and driving
+        AI-powered platforms from strategy to scale across digital health and SaaS. Grounded in a
+        Master's in Engineering and an Executive MBA, my approach blends technical rigor with
+        business strategy. What makes it distinct: executive breadth paired with genuine
+        practitioner depth. I set the direction and stay close enough to the work to make it real.
+      </p>
+      <div class="hero-cta">
+        <a href="#portfolio" class="btn btn-primary">View Portfolio ↓</a>
+        <a href="#contact" class="btn btn-ghost">Connect with Me</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-num-0">15+</div>
+          <div class="stat-label" id="stat-label-0">Years of Product Leadership</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-num-1">75+</div>
+          <div class="stat-label" id="stat-label-1">Person Organizations Led</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-num-2">CPO</div>
+          <div class="stat-label" id="stat-label-2">Scope &amp; Accountability</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-num-3">NYC</div>
+          <div class="stat-label" id="stat-label-3">NYC Metro Area</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO VISUAL -->
+    <div class="hero-visual" aria-hidden="true">
+      <div class="vis-glow"></div>
+      <div class="vis-orb"></div>
+
+      <!-- Floating dots -->
+      <div class="vis-dot d1" style="top:22%; left:12%;"></div>
+      <div class="vis-dot d2" style="top:68%; right:16%;"></div>
+      <div class="vis-dot d3" style="bottom:20%; left:38%;"></div>
+
+      <!-- Achievement cards -->
+      <div class="vis-card vc1">
+        <div class="vis-card-icon">🏥</div>
+        <div class="vis-card-text">
+          <div class="vis-card-label">Current Role</div>
+          <div class="vis-card-value">VP Product · XiFin</div>
+        </div>
+      </div>
+
+      <div class="vis-card vc2">
+        <div class="vis-card-icon">🎓</div>
+        <div class="vis-card-text">
+          <div class="vis-card-label">Executive Education</div>
+          <div class="vis-card-value">Harvard Leadership</div>
+        </div>
+      </div>
+
+      <div class="vis-card vc3">
+        <div class="vis-card-icon">🤖</div>
+        <div class="vis-card-text">
+          <div class="vis-card-label">Focus Area</div>
+          <div class="vis-card-value">AI · Digital Health</div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /hero-inner -->
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section id="portfolio">
+    <span class="section-tag">// portfolio</span>
+    <h2 class="section-title fade-in">Work &amp; Ventures</h2>
+    <p class="section-sub fade-in">A curated selection — not an exhaustive list — spanning products I've led to market, AI tools I've built hands-on, board engagements, and research. A representative view of how I create value inside and outside the executive seat.</p>
+
+    <div class="portfolio-tabs fade-in">
+      <button class="tab-btn active" onclick="filterCards('all', this)">All</button>
+      <button class="tab-btn" onclick="filterCards('professional', this)">💼 Professional Products</button>
+      <button class="tab-btn" onclick="filterCards('vibe', this)">⚡ Vibe Coded Products</button>
+      <button class="tab-btn" onclick="filterCards('board', this)">🏛️ Board Memberships</button>
+      <button class="tab-btn" onclick="filterCards('project', this)">🔬 Projects</button>
+    </div>
+
+    <div class="portfolio-grid" id="portfolio-grid"></div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <span class="section-tag">// experience</span>
+    <h2 class="section-title fade-in">Career Journey</h2>
+    <p class="section-sub fade-in">15+ years building and leading product organizations — from engineer to executive, with full P&amp;L ownership, enterprise-scale teams, and a consistent track record of turning vision into shipped product.</p>
+
+    <div class="timeline">
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-company">XiFin, Inc.</div>
+        <div class="timeline-role">Vice President, Product Management — Customer Technology</div>
+        <div class="timeline-period">July 2021 – Present · 4 years</div>
+        <div class="timeline-desc">Leading product vision, organizational strategy, and executive stakeholder relationships across an enterprise SaaS business. Define and drive AI product strategy — including LLM integration and intelligent automation — while serving as a direct technology advisor to CIOs and CTOs at customer organizations nationwide.</div>
+      </div>
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-company">Aetna, a CVS Health Company</div>
+        <div class="timeline-role">Lead Director, Product Management — Analytics &amp; Behavior Change</div>
+        <div class="timeline-period">June 2020 – July 2021 · 1 year · New York, NY</div>
+        <div class="timeline-desc">Built and led a new product function from zero — recruited and managed a multidisciplinary team of 4 PMs, 2 Data Scientists, UX, and Technical Writing. Owned the strategy and roadmap for a behavior change platform serving millions of members, applying ML to deliver personalized interventions that reduced cost of care and improved health outcomes.</div>
+      </div>
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-company">BioReference Laboratories</div>
+        <div class="timeline-role">Director of Product Management — Enterprise Business Systems</div>
+        <div class="timeline-period">September 2018 – June 2020 · 1 year 10 months</div>
+        <div class="timeline-desc">Owned multi-million dollar product portfolio spanning enterprise business systems. Identified automation and process improvement opportunities to generate revenue and reduce operational costs. Served as Senior CIO representative evaluating emerging technologies and partnering with engineering and PMO to address strategic challenges.</div>
+      </div>
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-company">BioReference Laboratories</div>
+        <div class="timeline-role">Product Manager</div>
+        <div class="timeline-period">January 2016 – September 2018 · 2 years 9 months · Greater NYC</div>
+        <div class="timeline-desc">Led global cross-functional teams across 5 time zones delivering custom digital solutions end-to-end. Managed deployment of up to 5 software products simultaneously. Served as interim Director of Software Development, leading 60 employees over 6 months.</div>
+      </div>
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-company">Siemens Healthineers</div>
+        <div class="timeline-role">Sr. Software Engineer / Business Analyst</div>
+        <div class="timeline-period">December 2013 – January 2016 · 2 years 2 months · Tarrytown, NY</div>
+        <div class="timeline-desc">Leveraged engineering expertise to deliver software solutions meeting business requirements and FDA compliance standards. Designed a preventative maintenance system for immunoassay analyzers that reduced unscheduled service requests by 30%. Consistently recognized by senior management for exceptional technical and business performance.</div>
+      </div>
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-company">VectraCor</div>
+        <div class="timeline-role">Engineer</div>
+        <div class="timeline-period">June 2013 – December 2013 · 7 months</div>
+        <div class="timeline-desc">Led product development of revolutionary ECG devices to predict real-time heart attack risk. Coordinated across manufacturing, quality, and marketing to ensure feasibility and compliance.</div>
+      </div>
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-company">NJIT</div>
+        <div class="timeline-role">Graduate Research Assistant</div>
+        <div class="timeline-period">July 2011 – June 2013 · 2 years</div>
+        <div class="timeline-desc">Developed code for an NIH-awarded brain-computer interface project and created Finite Element Analysis simulations of human tissue under near-infrared light. Coordinated a team of graduate researchers and published findings in peer-reviewed research. Performed computational analysis in MATLAB.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <span class="section-tag">// skills &amp; credentials</span>
+    <h2 class="section-title fade-in">Expertise</h2>
+    <p class="section-sub fade-in">Executive range backed by engineering depth — the rare combination of C-suite strategic thinking and hands-on product fluency that drives real transformation.</p>
+    <div class="skills-grid">
+
+      <div class="skill-card fade-in" style="border-color: rgba(56,189,248,0.25); background: linear-gradient(135deg, rgba(56,189,248,0.06), rgba(129,140,248,0.04));">
+        <div class="skill-icon">🤖</div>
+        <div class="skill-name">AI &amp; Generative AI</div>
+        <div class="skill-items">
+          <span class="skill-item">LLMs &amp; GenAI</span>
+          <span class="skill-item">Machine Learning</span>
+          <span class="skill-item">Agentic AI</span>
+          <span class="skill-item">Prompt Engineering</span>
+          <span class="skill-item">AI Product Design</span>
+          <span class="skill-item">Vibe Coding</span>
+          <span class="skill-item">Personalization</span>
+          <span class="skill-item">Predictive Models</span>
+        </div>
+      </div>
+
+      <div class="skill-card fade-in">
+        <div class="skill-icon">🚀</div>
+        <div class="skill-name">CPO-Level Leadership</div>
+        <div class="skill-items">
+          <span class="skill-item">Product Vision &amp; Strategy</span>
+          <span class="skill-item">P&amp;L Ownership</span>
+          <span class="skill-item">Org Design</span>
+          <span class="skill-item">Board Reporting</span>
+          <span class="skill-item">Build vs. Buy</span>
+          <span class="skill-item">Executive Alignment</span>
+          <span class="skill-item">OKRs &amp; Portfolio Mgmt</span>
+        </div>
+      </div>
+
+      <div class="skill-card fade-in">
+        <div class="skill-icon">🏥</div>
+        <div class="skill-name">AI in Digital Health</div>
+        <div class="skill-items">
+          <span class="skill-item">Clinical AI</span>
+          <span class="skill-item">Patient Intelligence</span>
+          <span class="skill-item">Provider Platforms</span>
+          <span class="skill-item">FDA &amp; Compliance</span>
+          <span class="skill-item">Diagnostics AI</span>
+          <span class="skill-item">Behavior Change ML</span>
+        </div>
+      </div>
+
+      <div class="skill-card fade-in">
+        <div class="skill-icon">📊</div>
+        <div class="skill-name">Data &amp; Analytics</div>
+        <div class="skill-items">
+          <span class="skill-item">Data Strategy</span>
+          <span class="skill-item">BI &amp; Dashboards</span>
+          <span class="skill-item">MATLAB</span>
+          <span class="skill-item">FEA Modeling</span>
+          <span class="skill-item">Systems Integration</span>
+          <span class="skill-item">Six Sigma</span>
+        </div>
+      </div>
+
+      <div class="skill-card fade-in">
+        <div class="skill-icon">🏆</div>
+        <div class="skill-name">Certifications</div>
+        <div class="skill-items">
+          <span class="skill-item">PMP</span>
+          <span class="skill-item">Six Sigma Green Belt</span>
+          <span class="skill-item">ScrumMaster (CSM)</span>
+          <span class="skill-item">Harvard Leadership</span>
+        </div>
+      </div>
+
+      <div class="skill-card fade-in">
+        <div class="skill-icon">🌍</div>
+        <div class="skill-name">Leadership &amp; Culture</div>
+        <div class="skill-items">
+          <span class="skill-item">AI Team Building</span>
+          <span class="skill-item">C-Suite Engagement</span>
+          <span class="skill-item">Cross-functional</span>
+          <span class="skill-item">CIO/CTO Advisory</span>
+          <span class="skill-item">English</span>
+          <span class="skill-item">Turkish</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education">
+    <span class="section-tag">// education</span>
+    <h2 class="section-title fade-in">Academic Background</h2>
+    <p class="section-sub fade-in">Engineering foundations combined with business leadership and executive education.</p>
+    <div class="edu-grid">
+
+      <div class="edu-card fade-in">
+        <div class="edu-school">Harvard University</div>
+        <div class="edu-degree">Certificate of Leadership Excellence in Executive Development</div>
+        <div class="edu-year">2024 – 2026</div>
+      </div>
+
+      <div class="edu-card fade-in">
+        <div class="edu-school">Montclair State University</div>
+        <div class="edu-degree">Executive MBA (EMBA) — Feliciano School of Business</div>
+        <div class="edu-year">2016 – 2018</div>
+      </div>
+
+      <div class="edu-card fade-in">
+        <div class="edu-school">New Jersey Institute of Technology</div>
+        <div class="edu-degree">Master of Science, Biomedical Engineering</div>
+        <div class="edu-year">Graduate Research — NIH BCI Project</div>
+      </div>
+
+      <div class="edu-card fade-in">
+        <div class="edu-school">Dokuz Eylul University</div>
+        <div class="edu-degree">Bachelor of Science, Electrical &amp; Electronics Engineering</div>
+        <div class="edu-year">Istanbul, Turkey</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <span class="section-tag">// contact</span>
+    <h2 class="section-title fade-in" style="text-align:center;">Let's Connect</h2>
+    <p class="section-sub fade-in" id="c-tagline" style="margin: 0 auto 3rem; text-align:center;">Interested in connecting around AI, digital health, and the future of product leadership.</p>
+    <div class="contact-card fade-in">
+      <p style="color:var(--muted); font-size:0.9rem;">Reach out directly</p>
+      <a class="contact-email" id="c-email-link" href="mailto:atabekyucel@gmail.com">atabekyucel@gmail.com</a>
+      <p style="color:var(--muted); font-size:0.85rem;" id="c-phone"></p>
+      <div class="contact-links">
+        <a class="contact-link" id="c-linkedin-link" href="https://www.linkedin.com/in/atabekyucel" target="_blank" rel="noopener">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+        <a class="contact-link" href="mailto:atabekyucel@gmail.com">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p style="color:var(--muted);">© 2025 Atabek C. Yucel · Built with intention · New York City</p>
+  </footer>
+
+  <script>
+    // ── INTERSECTION OBSERVER (fade-in) ─────────────────────────────
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 60);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // ── NAV SCROLL ──────────────────────────────────────────────────
+    window.addEventListener('scroll', () => {
+      document.querySelector('nav').style.background = window.scrollY > 20
+        ? 'rgba(8,12,20,0.95)' : 'rgba(8,12,20,0.85)';
+    });
+
+    // ── PORTFOLIO FILTER ────────────────────────────────────────────
+    function filterCards(category, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.portfolio-card').forEach(card => {
+        card.style.display = (category === 'all' || card.dataset.category === category) ? 'block' : 'none';
+      });
+    }
+
+    // ── CMS CONTENT LOADER ──────────────────────────────────────────
+    const CMS_KEY = 'acy_site_content';
+
+    const CAT_TAG   = { professional: 'tag-professional', vibe: 'tag-vibe', board: 'tag-board', project: 'tag-project' };
+    const CAT_LABEL = { professional: '💼 Professional Product', vibe: '⚡ Vibe Coded', board: '🏛️ Board', project: '🔬 Project' };
+
+    const DEFAULTS = {
+      hero: {
+        badge:       'Chief Product Officer · AI & Digital Health',
+        subtitle:    'Enterprise AI Strategy · Digital Health Transformation · Executive Leadership',
+        description: 'I operate at the CPO level — defining product vision, aligning organizations, and driving AI-powered platforms from strategy to scale across digital health and SaaS. Grounded in a Master\'s in Engineering and an Executive MBA, my approach blends technical rigor with business strategy. What makes it distinct: executive breadth paired with genuine practitioner depth. I set the direction and stay close enough to the work to make it real.',
+        stats: [
+          { num: '15+', label: 'Years of Product Leadership' },
+          { num: '75+', label: 'Person Organizations Led' },
+          { num: 'CPO',  label: 'Scope & Accountability' },
+          { num: 'NYC',  label: 'NYC Metro Area' }
+        ]
+      },
+      portfolio: [
+        { id:'c1', category:'professional', icon:'🧠', title:'AI-Driven Behaviour Change Platform',       desc:'Leveraging individual health history and behavioral science to identify personalized "Next Best Actions" at the member level — driving measurable improvements in health outcomes and reducing cost of care across millions of members.', tags:['AI/ML','Behavior Science','Health Outcomes','Aetna · CVS Health'], linkText:'Learn More', linkUrl:'' },
+        { id:'c1b', category:'professional', icon:'🏥', title:'Digital Patient Engagement Platform',      desc:'End-to-end patient experience platform for ancillary healthcare settings — an AI-powered patient portal and intelligent communication tools that transform how patients navigate care from scheduling through post-visit follow-up.', tags:['Patient Experience','AI','Digital Health','XiFin'], linkText:'Learn More', linkUrl:'' },
+        { id:'c1c', category:'professional', icon:'🔗', title:'Provider Engagement Platform',             desc:'Modern technology connecting primary care providers to ancillary healthcare organizations — streamlining referrals, care coordination, and clinical communications at enterprise scale to close gaps between care settings.', tags:['Provider Network','Enterprise','Interoperability','XiFin'], linkText:'Learn More', linkUrl:'' },
+        { id:'c1d', category:'professional', icon:'📊', title:'AI-Driven Business Intelligence Platform', desc:'Enterprise analytics platform powered by AI — surfacing actionable insights from complex healthcare data to drive strategic decisions across clinical, operational, and financial domains at the executive and board level.', tags:['AI','Analytics','Business Intelligence','Enterprise'], linkText:'Learn More', linkUrl:'' },
+        { id:'c1e', category:'professional', icon:'🏢', title:'Enterprise Business Product Portfolio',    desc:'Multi-product portfolio of enterprise business systems spanning revenue cycle management, compliance, workflow automation, and operational management — delivered across multiple product lines with full P&L ownership.', tags:['Enterprise SaaS','Revenue Cycle','Product Portfolio','BioReference'], linkText:'Learn More', linkUrl:'' },
+        { id:'c2',  category:'vibe', icon:'🏠', title:'Doğru İlan',                  desc:'AI-powered Chrome extension that helps real estate agents create better listings. Automatically generates optimized titles and descriptions, checks listings for rule violations before submission, and suggests improvements — all without changing how agents already work. Fully productionalized and revenue generating.', tags:['Chrome Extension','AI','Real Estate','Revenue Generating'], linkText:'View Product', linkUrl:'' },
+        { id:'c3',  category:'vibe', icon:'⭐', title:'AI Review Optimizer',         desc:'It has never been easier to collect reviews for your business. This app removes the friction from the review process — making it simple for customers to leave feedback and helping businesses effortlessly grow their online reputation.', tags:['AI','Reviews','SaaS','Customer Experience'], linkText:'View Product', linkUrl:'' },
+        { id:'c3b', category:'vibe', icon:'💻', title:'This Website',                desc:'Built entirely through AI-assisted vibe coding — a modern, CMS-driven personal site showcasing executive presence, portfolio work, and thought leadership. Designed, built, and iterated in real time with Claude.', tags:['Vibe Coded','Claude AI','HTML · CSS · JS'], linkText:'You\'re Here', linkUrl:'#' },
+        { id:'c3c', category:'vibe', icon:'🔒', title:'Stealth App — Coming Soon', desc:'Something new is in the pipeline. Details coming soon.', tags:['Stealth','Coming Soon'], linkText:'Stay Tuned', linkUrl:'' },
+        { id:'c4',  category:'board', icon:'🌱', title:'Neobar',                                desc:'Board member for Neobar, a plant-based vegan snack bar brand. Contributing strategic guidance on product positioning, go-to-market strategy, and growth in the health food and wellness consumer space.', tags:['Board Member','Plant-Based','Food & Wellness','Consumer Products'], linkText:'Visit Neobar', linkUrl:'' },
+        { id:'c4b', category:'board', icon:'🌍', title:'EA — International Education Platform', desc:'Board member for EA, an international education platform with SaaS offerings. Advising on product strategy, technology roadmap, and digital transformation to scale access to quality education across global markets.', tags:['Board Member','EdTech','SaaS','International'], linkText:'Visit EA', linkUrl:'' },
+        { id:'c5', category:'project', icon:'🧠', title:'Brain-Computer Interface Research', desc:'As a Graduate Research Assistant at NJIT, contributed to an NIH-awarded brain-computer interface project — one of the earliest intersections of computational modeling and human neuroscience. Developed algorithms to advance BCI capabilities and built Finite Element Analysis simulations modeling temperature elevation in neural tissue exposed to near-infrared laser light. Findings were published in peer-reviewed research: “FEA Modeling of Temperature Elevation in Neural Tissue Illuminated by a Laser: Transient Effects” — contributing to the scientific foundation for safe, non-invasive brain stimulation technologies.', tags:['Brain-Computer Interface','NIH-Awarded','FEA Modeling','Near-Infrared','MATLAB','Published Research'], linkText:'Read Publication', linkUrl:'' },
+        { id:'c6', category:'project', icon:'🦾', title:'Robotic Arm — Real-Time Laser Tracking', desc:'Designed and built an award-winning robotic arm system controlled entirely by a real-time laser tracking algorithm — earning 1st place across 26 competing projects. The system used computer vision and real-time signal processing to track a laser point and translate its coordinates into precise mechanical arm movements with no manual input. Recognized at the university level as a standout demonstration of applied engineering, combining hardware control, algorithm design, and real-time computation into a single cohesive system.', tags:['Robotics','Real-Time Tracking','Computer Vision','Signal Processing','Award-Winning'], linkText:'Learn More', linkUrl:'' }
+      ],
+      contact: {
+        email:    'atabekyucel@gmail.com',
+        phone:    '',
+        linkedin: 'https://www.linkedin.com/in/atabekyucel',
+        tagline:  'Interested in connecting around AI, digital health, and the future of product leadership.'
+      }
+    };
+
+    function loadCMS() {
+      try {
+        const raw = localStorage.getItem(CMS_KEY);
+        return raw ? JSON.parse(raw) : DEFAULTS;
+      } catch { return DEFAULTS; }
+    }
+
+    function renderPortfolio(cards) {
+      const grid = document.getElementById('portfolio-grid');
+      grid.innerHTML = cards.map(card => `
+        <div class="portfolio-card fade-in" data-category="${card.category}">
+          <span class="card-tag ${CAT_TAG[card.category] || 'tag-project'}">${CAT_LABEL[card.category] || card.category}</span>
+          <div class="card-icon">${card.icon || '📄'}</div>
+          <h3 class="card-title">${card.title}</h3>
+          <p class="card-desc">${card.desc}</p>
+          <div class="card-meta">${(card.tags||[]).map(t=>`<span class="card-tech">${t}</span>`).join('')}</div>
+          ${card.linkUrl ? `<a href="${card.linkUrl}" class="card-link" target="_blank" rel="noopener">${card.linkText} →</a>` : ''}
+        </div>
+      `).join('');
+      grid.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    }
+
+    function applyHero(hero) {
+      const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+      set('h-badge',    hero.badge);
+      set('h-subtitle', hero.subtitle);
+      set('h-desc',     hero.description);
+      (hero.stats || []).forEach((s, i) => { set(`stat-num-${i}`, s.num); set(`stat-label-${i}`, s.label); });
+    }
+
+    function applyContact(ct) {
+      const emailEl  = document.getElementById('c-email-link');
+      const phoneEl  = document.getElementById('c-phone');
+      const tagEl    = document.getElementById('c-tagline');
+      const linkedEl = document.getElementById('c-linkedin-link');
+      if (emailEl  && ct.email)    { emailEl.href = 'mailto:' + ct.email; emailEl.textContent = ct.email; }
+      if (phoneEl  && ct.phone)    { phoneEl.textContent = ct.phone; }
+      if (tagEl    && ct.tagline)  { tagEl.textContent = ct.tagline; }
+      if (linkedEl && ct.linkedin) { linkedEl.href = ct.linkedin; }
+    }
+
+    // Boot
+    (function () {
+      const c = loadCMS();
+      applyHero(c.hero || DEFAULTS.hero);
+      renderPortfolio(c.portfolio && c.portfolio.length ? c.portfolio : DEFAULTS.portfolio);
+      applyContact(c.contact || DEFAULTS.contact);
+    })();
+  </script>
+
+</body>
+</html>

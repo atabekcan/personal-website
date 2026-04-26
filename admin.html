@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — ACY Site</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #080c14; --surface: #0f1520; --surface2: #161d2e;
+      --border: rgba(255,255,255,0.08); --accent: #38bdf8; --accent2: #818cf8;
+      --accent3: #34d399; --text: #e2e8f0; --muted: #64748b; --danger: #f87171;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+    /* ── AUTH ── */
+    .auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .auth-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2.5rem; width: 360px; text-align: center;
+    }
+    .auth-logo { font-size: 2rem; margin-bottom: 1rem; }
+    .auth-card h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+    .auth-card p { color: var(--muted); font-size: 0.875rem; margin-bottom: 2rem; }
+
+    /* ── HEADER ── */
+    .admin-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .admin-logo {
+      font-weight: 800; font-size: 1rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .header-actions { display: flex; gap: 0.625rem; align-items: center; }
+    .save-indicator {
+      font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 6px;
+      border: 1px solid rgba(56,189,248,0.2);
+      background: rgba(56,189,248,0.08); color: var(--accent);
+      transition: all 0.3s;
+    }
+    .save-indicator.saved { background: rgba(52,211,153,0.08); color: var(--accent3); border-color: rgba(52,211,153,0.2); }
+
+    /* ── LAYOUT ── */
+    .admin-layout { display: flex; min-height: calc(100vh - 60px); }
+
+    /* ── SIDEBAR ── */
+    .sidebar { width: 210px; background: var(--surface); border-right: 1px solid var(--border); padding: 1.25rem 0.875rem; flex-shrink: 0; }
+    .sidebar-section { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; padding: 0 0.625rem; margin: 1.25rem 0 0.5rem; }
+    .sidebar-section:first-child { margin-top: 0; }
+    .nav-btn {
+      display: flex; align-items: center; gap: 0.6rem;
+      width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px;
+      background: none; border: none; color: var(--muted);
+      font-family: 'Inter', sans-serif; font-size: 0.875rem; font-weight: 500;
+      cursor: pointer; text-align: left; transition: all 0.2s; margin-bottom: 0.125rem;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .nav-btn.active { background: rgba(56,189,248,0.1); color: var(--accent); }
+
+    /* ── MAIN ── */
+    .admin-main { flex: 1; padding: 2rem 2.5rem; overflow-y: auto; max-width: 860px; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .panel-header { margin-bottom: 2rem; }
+    .panel-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.4rem; }
+    .panel-sub { color: var(--muted); font-size: 0.875rem; line-height: 1.6; }
+
+    /* ── FORM ── */
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.45rem; }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 9px; color: var(--text); font-family: 'Inter', sans-serif;
+      font-size: 0.9rem; padding: 0.625rem 0.875rem; outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: rgba(56,189,248,0.45); }
+    .form-textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+    .form-select option { background: var(--surface2); }
+    .form-hint { font-size: 0.73rem; color: var(--muted); margin-top: 0.35rem; line-height: 1.5; }
+    .form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-section-title { font-size: 0.95rem; font-weight: 700; margin: 2rem 0 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.55rem 1.1rem; border-radius: 9px; font-family: 'Inter', sans-serif;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #000; }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.04); }
+    .btn-danger { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.2); color: var(--danger); }
+    .btn-danger:hover { background: rgba(248,113,113,0.18); }
+    .btn-sm { padding: 0.375rem 0.8rem; font-size: 0.78rem; }
+    .btn-icon { padding: 0.375rem 0.6rem; }
+
+    /* ── CARD LIST (portfolio) ── */
+    .card-list { display: flex; flex-direction: column; gap: 0.625rem; }
+    .card-row {
+      display: flex; align-items: center; gap: 1rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 0.875rem 1.1rem;
+      transition: border-color 0.2s;
+    }
+    .card-row:hover { border-color: rgba(56,189,248,0.15); }
+    .card-row-icon { font-size: 1.4rem; flex-shrink: 0; width: 32px; text-align: center; }
+    .card-row-info { flex: 1; min-width: 0; }
+    .card-row-title { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 0.2rem; }
+    .card-row-meta { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--muted); }
+    .cat-pill { font-size: 0.65rem; padding: 0.15rem 0.55rem; border-radius: 100px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+    .cat-professional { background: rgba(52,211,153,0.1); color: var(--accent3); }
+    .cat-vibe { background: rgba(56,189,248,0.1); color: var(--accent); }
+    .cat-board { background: rgba(251,191,36,0.1); color: #fbbf24; }
+    .cat-project { background: rgba(129,140,248,0.1); color: var(--accent2); }
+    .card-row-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+    .reorder-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.75rem; transition: all 0.2s; }
+    .reorder-btn:hover:not(:disabled) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .reorder-btn:disabled { opacity: 0.3; cursor: default; }
+    .empty-state { text-align: center; padding: 3.5rem 1rem; color: var(--muted); border: 1px dashed var(--border); border-radius: 12px; }
+    .empty-state-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .empty-state p { font-size: 0.875rem; }
+
+    /* ── STATS GRID ── */
+    .stats-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .stat-edit-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+    .stat-edit-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; padding: 2rem; width: 100%; max-width: 560px;
+      max-height: 92vh; overflow-y: auto;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; }
+    .modal-title { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; }
+    .modal-close { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 7px; cursor: pointer; padding: 0.3rem 0.55rem; font-size: 1rem; line-height: 1; transition: all 0.2s; }
+    .modal-close:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .modal-footer { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+
+    /* ── DIVIDER ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.75rem 0; }
+
+    /* ── NOTICE ── */
+    .notice { background: rgba(56,189,248,0.07); border: 1px solid rgba(56,189,248,0.15); border-radius: 10px; padding: 0.875rem 1rem; font-size: 0.83rem; color: #94a3b8; line-height: 1.6; margin-bottom: 1.5rem; }
+    .notice strong { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .admin-main { padding: 1.25rem; }
+      .form-row2 { grid-template-columns: 1fr; }
+      .stats-edit-grid { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AUTH SCREEN -->
+  <div class="auth-screen" id="auth-screen">
+    <div class="auth-card">
+      <div class="auth-logo">🔐</div>
+      <h2>Content Admin</h2>
+      <p>Enter your password to manage site content</p>
+      <div class="form-group">
+        <input type="password" class="form-input" id="pwd-input" placeholder="Password" style="text-align:center; letter-spacing:0.1em;" />
+      </div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="doAuth()">Sign In</button>
+      <p id="auth-err" style="color:var(--danger); font-size:0.8rem; margin-top:0.75rem; display:none;">Incorrect password. Try again.</p>
+    </div>
+  </div>
+
+  <!-- ADMIN APP -->
+  <div id="admin-app" style="display:none;">
+
+    <header class="admin-header">
+      <div class="admin-logo">ACY · Admin</div>
+      <div class="header-actions">
+        <span class="save-indicator" id="save-indicator">● Saved</span>
+        <button class="btn btn-ghost btn-sm" onclick="doExport()">↓ Export</button>
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
+          ↑ Import
+          <input type="file" accept=".json" style="display:none;" onchange="doImport(event)" />
+        </label>
+        <a href="index.html" target="_blank" class="btn btn-primary btn-sm">View Site ↗</a>
+      </div>
+    </header>
+
+    <div class="admin-layout">
+
+      <nav class="sidebar">
+        <div class="sidebar-section">Content</div>
+        <button class="nav-btn active" onclick="showPanel('portfolio', this)">📁 Portfolio</button>
+        <button class="nav-btn" onclick="showPanel('hero', this)">🏠 Hero</button>
+        <button class="nav-btn" onclick="showPanel('contact', this)">✉️ Contact</button>
+      </nav>
+
+      <main class="admin-main">
+
+        <!-- ── PORTFOLIO PANEL ── -->
+        <div class="panel active" id="panel-portfolio">
+          <div class="panel-header" style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+            <div>
+              <div class="panel-title">Portfolio Cards</div>
+              <div class="panel-sub">Add, edit, reorder, or remove cards displayed in the Work &amp; Ventures section of your site.</div>
+            </div>
+            <button class="btn btn-primary" onclick="openModal()">+ Add Card</button>
+          </div>
+          <div class="notice">
+            <strong>Tip:</strong> Use the ↑↓ arrows to reorder cards. The order here matches what visitors see on the site. Changes save automatically.
+          </div>
+          <div class="card-list" id="card-list">
+            <div class="empty-state"><div class="empty-state-icon">📭</div><p>No cards yet — click <strong>Add Card</strong> to get started.</p></div>
+          </div>
+        </div>
+
+        <!-- ── HERO PANEL ── -->
+        <div class="panel" id="panel-hero">
+          <div class="panel-header">
+            <div class="panel-title">Hero Section</div>
+            <div class="panel-sub">Edit your headline, badge, description, and the four stat highlights shown at the bottom of the hero.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Badge (pill above your name)</label>
+            <input type="text" class="form-input" id="h-badge" oninput="debouncedSave()" />
+            <p class="form-hint">e.g. "Chief Product Officer · AI & Digital Health"</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subtitle</label>
+            <input type="text" class="form-input" id="h-subtitle" oninput="debouncedSave()" />
+            <p class="form-hint">The line directly below your name, separated by · dots</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="h-desc" rows="5" oninput="debouncedSave()"></textarea>
+            <p class="form-hint">Your 2–3 sentence executive bio shown in the hero section</p>
+          </div>
+          <div class="form-section-title">Stat Highlights</div>
+          <div class="stats-edit-grid" id="stats-edit-grid"></div>
+        </div>
+
+        <!-- ── CONTACT PANEL ── -->
+        <div class="panel" id="panel-contact">
+          <div class="panel-header">
+            <div class="panel-title">Contact Info</div>
+            <div class="panel-sub">Update your contact details and the tagline shown in the contact section.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="c-email" oninput="debouncedSave()" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" class="form-input" id="c-phone" oninput="debouncedSave()" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">LinkedIn URL</label>
+            <input type="url" class="form-input" id="c-linkedin" oninput="debouncedSave()" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Section Tagline</label>
+            <textarea class="form-textarea" id="c-tagline" rows="3" oninput="debouncedSave()"></textarea>
+            <p class="form-hint">The sentence shown above your email in the Contact section</p>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- CARD MODAL -->
+  <div class="modal-backdrop" id="card-modal" style="display:none;" onclick="backdropClose(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title-text">Add Portfolio Card</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="m-category">
+          <option value="professional">💼 Professional Product</option>
+          <option value="vibe">⚡ Vibe Coded Product</option>
+          <option value="board">🏛️ Board Membership</option>
+          <option value="project">🔬 Project</option>
+        </select>
+      </div>
+
+      <div class="form-row2">
+        <div class="form-group">
+          <label class="form-label">Icon (emoji)</label>
+          <input type="text" class="form-input" id="m-icon" placeholder="🚀" maxlength="4" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link Button Text</label>
+          <input type="text" class="form-input" id="m-linktext" placeholder="View Project" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input type="text" class="form-input" id="m-title" placeholder="Product or project name" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="m-desc" rows="4" placeholder="What is this? What was your role? What was the impact?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tags</label>
+        <input type="text" class="form-input" id="m-tags" placeholder="AI, Healthcare, SaaS" />
+        <p class="form-hint">Comma-separated — shown as small badges on the card</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Link URL</label>
+        <input type="url" class="form-input" id="m-linkurl" placeholder="https://" />
+        <p class="form-hint">Leave empty to hide the link button</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCard()">Save Card</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const KEY  = 'acy_site_content';
+    const PWD  = '200550acy2026';
+
+    // ── DEFAULT CONTENT ─────────────────────────────────────────────
+    const DEFAULTS = {
+      hero: {
+        badge:       'Chief Product Officer · AI & Digital Health',
+        subtitle:    'Enterprise AI Strategy · Digital Health Transformation · Executive Leadership',
+        description: 'I operate at the CPO level — defining product vision, aligning organizations, and driving AI-powered platforms from strategy to scale across digital health and SaaS. Grounded in a Master\'s in Engineering and an Executive MBA, my approach blends technical rigor with business strategy. What makes it distinct: executive breadth paired with genuine practitioner depth. I set the direction and stay close enough to the work to make it real.',
+        stats: [
+          { num: '15+', label: 'Years of Product Leadership' },
+          { num: '75+', label: 'Person Organizations Led' },
+          { num: 'CPO',  label: 'Scope & Accountability' },
+          { num: 'NYC',  label: 'NYC Metro Area' }
+        ]
+      },
+      portfolio: [
+        { id: 'c1',  category: 'professional', icon: '🧠', title: 'AI-Driven Behaviour Change Platform',       desc: 'Leveraging individual health history and behavioral science to identify personalized "Next Best Actions" at the member level — driving measurable improvements in health outcomes and reducing cost of care across millions of members.', tags: ['AI/ML','Behavior Science','Health Outcomes','Aetna · CVS Health'], linkText: 'Learn More', linkUrl: '' },
+        { id: 'c1b', category: 'professional', icon: '🏥', title: 'Digital Patient Engagement Platform',      desc: 'End-to-end patient experience platform for ancillary healthcare settings — an AI-powered patient portal and intelligent communication tools that transform how patients navigate care from scheduling through post-visit follow-up.', tags: ['Patient Experience','AI','Digital Health','XiFin'], linkText: 'Learn More', linkUrl: '' },
+        { id: 'c1c', category: 'professional', icon: '🔗', title: 'Provider Engagement Platform',             desc: 'Modern technology connecting primary care providers to ancillary healthcare organizations — streamlining referrals, care coordination, and clinical communications at enterprise scale to close gaps between care settings.', tags: ['Provider Network','Enterprise','Interoperability','XiFin'], linkText: 'Learn More', linkUrl: '' },
+        { id: 'c1d', category: 'professional', icon: '📊', title: 'AI-Driven Business Intelligence Platform', desc: 'Enterprise analytics platform powered by AI — surfacing actionable insights from complex healthcare data to drive strategic decisions across clinical, operational, and financial domains at the executive and board level.', tags: ['AI','Analytics','Business Intelligence','Enterprise'], linkText: 'Learn More', linkUrl: '' },
+        { id: 'c1e', category: 'professional', icon: '🏢', title: 'Enterprise Business Product Portfolio',    desc: 'Multi-product portfolio of enterprise business systems spanning revenue cycle management, compliance, workflow automation, and operational management — delivered across multiple product lines with full P&L ownership.', tags: ['Enterprise SaaS','Revenue Cycle','Product Portfolio','BioReference'], linkText: 'Learn More', linkUrl: '' },
+        { id: 'c2',  category: 'vibe', icon: '🏠', title: 'Doğru İlan',                  desc: 'AI-powered Chrome extension that helps real estate agents create better listings. Automatically generates optimized titles and descriptions, checks listings for rule violations before submission, and suggests improvements — all without changing how agents already work. Fully productionalized and revenue generating.', tags: ['Chrome Extension','AI','Real Estate','Revenue Generating'], linkText: 'View Product', linkUrl: '' },
+        { id: 'c3',  category: 'vibe', icon: '⭐', title: 'AI Review Optimizer',         desc: 'It has never been easier to collect reviews for your business. This app removes the friction from the review process — making it simple for customers to leave feedback and helping businesses effortlessly grow their online reputation.', tags: ['AI','Reviews','SaaS','Customer Experience'], linkText: 'View Product', linkUrl: '' },
+        { id: 'c3b', category: 'vibe', icon: '💻', title: 'This Website',                desc: 'Built entirely through AI-assisted vibe coding — a modern, CMS-driven personal site showcasing executive presence, portfolio work, and thought leadership. Designed, built, and iterated in real time with Claude.', tags: ['Vibe Coded','Claude AI','HTML · CSS · JS'], linkText: "You're Here", linkUrl: '#' },
+        { id: 'c3c', category: 'vibe', icon: '🔒', title: 'Stealth App — Coming Soon', desc: 'Something new is in the pipeline. Details coming soon.', tags: ['Stealth','Coming Soon'], linkText: 'Stay Tuned', linkUrl: '' },
+        { id: 'c4',  category: 'board', icon: '🌱', title: 'Neobar',                                desc: 'Board member for Neobar, a plant-based vegan snack bar brand. Contributing strategic guidance on product positioning, go-to-market strategy, and growth in the health food and wellness consumer space.', tags: ['Board Member','Plant-Based','Food & Wellness','Consumer Products'], linkText: 'Visit Neobar', linkUrl: '' },
+        { id: 'c4b', category: 'board', icon: '🌍', title: 'EA — International Education Platform', desc: 'Board member for EA, an international education platform with SaaS offerings. Advising on product strategy, technology roadmap, and digital transformation to scale access to quality education across global markets.', tags: ['Board Member','EdTech','SaaS','International'], linkText: 'Visit EA', linkUrl: '' },
+        { id: 'c5', category: 'project', icon: '🧠', title: 'Brain-Computer Interface Research', desc: 'As a Graduate Research Assistant at NJIT, contributed to an NIH-awarded brain-computer interface project — one of the earliest intersections of computational modeling and human neuroscience. Developed algorithms to advance BCI capabilities and built Finite Element Analysis simulations modeling temperature elevation in neural tissue exposed to near-infrared laser light. Findings were published in peer-reviewed research: "FEA Modeling of Temperature Elevation in Neural Tissue Illuminated by a Laser: Transient Effects" — contributing to the scientific foundation for safe, non-invasive brain stimulation technologies.', tags: ['Brain-Computer Interface','NIH-Awarded','FEA Modeling','MATLAB','Published Research'], linkText: 'Read Publication', linkUrl: '' },
+        { id: 'c6', category: 'project', icon: '🦾', title: 'Robotic Arm — Real-Time Laser Tracking', desc: 'Designed and built an award-winning robotic arm controlled entirely by a real-time laser tracking algorithm — earning 1st place across 26 competing projects. Used computer vision and real-time signal processing to track a laser point and translate its coordinates into precise mechanical arm movements with no manual input. Recognized at the university level for outstanding applied engineering: combining hardware control, algorithm design, and real-time computation into a single cohesive system.', tags: ['Robotics','Real-Time Tracking','Computer Vision','Signal Processing','Award-Winning'], linkText: 'Learn More', linkUrl: '' }
+      ],
+      contact: {
+        email:    'atabekyucel@gmail.com',
+        phone:    '',
+        linkedin: 'https://www.linkedin.com/in/atabekyucel',
+        tagline:  'Interested in connecting around AI, digital health, and the future of product leadership.'
+      }
+    };
+
+    // ── UTILS ────────────────────────────────────────────────────────
+    const uid  = () => Math.random().toString(36).slice(2,9);
+    const deep = obj => JSON.parse(JSON.stringify(obj));
+
+    const CAT_LABELS = {
+      professional: '💼 Professional',
+      vibe:         '⚡ Vibe Coded',
+      board:        '🏛️ Board',
+      project:      '🔬 Project'
+    };
+
+    // ── STORAGE ──────────────────────────────────────────────────────
+    function load() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        return raw ? JSON.parse(raw) : deep(DEFAULTS);
+      } catch { return deep(DEFAULTS); }
+    }
+
+    function save(content) {
+      localStorage.setItem(KEY, JSON.stringify(content));
+      const el = document.getElementById('save-indicator');
+      el.textContent = '✓ Saved';
+      el.classList.add('saved');
+      clearTimeout(save._t);
+      save._t = setTimeout(() => { el.textContent = '● Saved'; el.classList.remove('saved'); }, 2000);
+    }
+
+    // ── AUTH ─────────────────────────────────────────────────────────
+    function doAuth() {
+      if (document.getElementById('pwd-input').value === PWD) {
+        sessionStorage.setItem('acy_ok', '1');
+        document.getElementById('auth-screen').style.display  = 'none';
+        document.getElementById('admin-app').style.display    = 'block';
+        initAdmin();
+      } else {
+        document.getElementById('auth-err').style.display = 'block';
+      }
+    }
+    document.getElementById('pwd-input').addEventListener('keydown', e => { if (e.key === 'Enter') doAuth(); });
+    if (sessionStorage.getItem('acy_ok') === '1') {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('admin-app').style.display   = 'block';
+    }
+
+    // ── INIT ─────────────────────────────────────────────────────────
+    function initAdmin() {
+      const c = load();
+      fillHeroForm(c.hero);
+      fillContactForm(c.contact);
+      renderCardList(c.portfolio);
+    }
+    if (sessionStorage.getItem('acy_ok') === '1') initAdmin();
+
+    // ── PANELS ───────────────────────────────────────────────────────
+    function showPanel(id, btn) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('panel-' + id).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // ── HERO FORM ────────────────────────────────────────────────────
+    function fillHeroForm(hero) {
+      document.getElementById('h-badge').value    = hero.badge    || '';
+      document.getElementById('h-subtitle').value = hero.subtitle || '';
+      document.getElementById('h-desc').value     = hero.description || '';
+      const grid = document.getElementById('stats-edit-grid');
+      grid.innerHTML = (hero.stats || []).map((s, i) => `
+        <div class="stat-edit-card">
+          <div class="stat-edit-label">Stat ${i+1}</div>
+          <div class="form-group" style="margin-bottom:.75rem;">
+            <label class="form-label" style="font-size:.68rem;">Value</label>
+            <input type="text" class="form-input" value="${esc(s.num)}"   oninput="updateStat(${i},'num',  this.value)" placeholder="15+" />
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" style="font-size:.68rem;">Label</label>
+            <input type="text" class="form-input" value="${esc(s.label)}" oninput="updateStat(${i},'label',this.value)" placeholder="Years of Experience" />
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateStat(i, field, val) {
+      const c = load(); c.hero.stats[i][field] = val; save(c);
+    }
+
+    // ── CONTACT FORM ─────────────────────────────────────────────────
+    function fillContactForm(ct) {
+      document.getElementById('c-email').value    = ct.email    || '';
+      document.getElementById('c-phone').value    = ct.phone    || '';
+      document.getElementById('c-linkedin').value = ct.linkedin || '';
+      document.getElementById('c-tagline').value  = ct.tagline  || '';
+    }
+
+    // Debounced save for text inputs
+    let _saveTimer;
+    function debouncedSave() {
+      clearTimeout(_saveTimer);
+      _saveTimer = setTimeout(() => {
+        const c = load();
+        c.hero.badge       = document.getElementById('h-badge').value;
+        c.hero.subtitle    = document.getElementById('h-subtitle').value;
+        c.hero.description = document.getElementById('h-desc').value;
+        c.contact.email    = document.getElementById('c-email').value;
+        c.contact.phone    = document.getElementById('c-phone').value;
+        c.contact.linkedin = document.getElementById('c-linkedin').value;
+        c.contact.tagline  = document.getElementById('c-tagline').value;
+        save(c);
+      }, 400);
+    }
+
+    // ── CARD LIST ────────────────────────────────────────────────────
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+    function renderCardList(portfolio) {
+      const el = document.getElementById('card-list');
+      if (!portfolio || !portfolio.length) {
+        el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>No cards yet — click <strong>Add Card</strong> to get started.</p></div>';
+        return;
+      }
+      el.innerHTML = portfolio.map((card, i) => `
+        <div class="card-row">
+          <div class="card-row-icon">${card.icon || '📄'}</div>
+          <div class="card-row-info">
+            <div class="card-row-title">${esc(card.title)}</div>
+            <div class="card-row-meta">
+              <span class="cat-pill cat-${card.category}">${CAT_LABELS[card.category] || card.category}</span>
+              ${card.tags && card.tags.length ? '<span>· ' + card.tags.slice(0,3).map(esc).join(', ') + '</span>' : ''}
+            </div>
+          </div>
+          <div class="card-row-actions">
+            <button class="reorder-btn" onclick="moveCard(${i},-1)" ${i===0?'disabled':''}>↑</button>
+            <button class="reorder-btn" onclick="moveCard(${i}, 1)" ${i===portfolio.length-1?'disabled':''}>↓</button>
+            <button class="btn btn-ghost btn-sm" onclick="openModal(${i})">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCard(${i})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function moveCard(i, dir) {
+      const c = load(); const a = c.portfolio; const j = i + dir;
+      if (j < 0 || j >= a.length) return;
+      [a[i], a[j]] = [a[j], a[i]];
+      save(c); renderCardList(a);
+    }
+
+    function deleteCard(i) {
+      if (!confirm('Delete this card? This cannot be undone.')) return;
+      const c = load(); c.portfolio.splice(i, 1); save(c); renderCardList(c.portfolio);
+    }
+
+    // ── MODAL ────────────────────────────────────────────────────────
+    let _editIdx = null;
+
+    function openModal(idx) {
+      _editIdx = idx !== undefined ? idx : null;
+      document.getElementById('modal-title-text').textContent = _editIdx === null ? 'Add Portfolio Card' : 'Edit Card';
+
+      if (_editIdx !== null) {
+        const card = load().portfolio[_editIdx];
+        document.getElementById('m-category').value = card.category;
+        document.getElementById('m-icon').value      = card.icon     || '';
+        document.getElementById('m-title').value     = card.title    || '';
+        document.getElementById('m-desc').value      = card.desc     || '';
+        document.getElementById('m-tags').value      = (card.tags||[]).join(', ');
+        document.getElementById('m-linktext').value  = card.linkText || 'Learn More';
+        document.getElementById('m-linkurl').value   = card.linkUrl  || '';
+      } else {
+        document.getElementById('m-category').value = 'professional';
+        document.getElementById('m-icon').value      = '';
+        document.getElementById('m-title').value     = '';
+        document.getElementById('m-desc').value      = '';
+        document.getElementById('m-tags').value      = '';
+        document.getElementById('m-linktext').value  = 'Learn More';
+        document.getElementById('m-linkurl').value   = '';
+      }
+      document.getElementById('card-modal').style.display = 'flex';
+      setTimeout(() => document.getElementById('m-title').focus(), 50);
+    }
+
+    function closeModal() {
+      document.getElementById('card-modal').style.display = 'none';
+      _editIdx = null;
+    }
+
+    function backdropClose(e) { if (e.target === document.getElementById('card-modal')) closeModal(); }
+
+    function saveCard() {
+      const title = document.getElementById('m-title').value.trim();
+      if (!title) { document.getElementById('m-title').focus(); return; }
+
+      const card = {
+        id:       _editIdx !== null ? load().portfolio[_editIdx].id : uid(),
+        category: document.getElementById('m-category').value,
+        icon:     document.getElementById('m-icon').value.trim()     || '📄',
+        title,
+        desc:     document.getElementById('m-desc').value.trim(),
+        tags:     document.getElementById('m-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+        linkText: document.getElementById('m-linktext').value.trim() || 'Learn More',
+        linkUrl:  document.getElementById('m-linkurl').value.trim()
+      };
+
+      const c = load();
+      if (_editIdx !== null) { c.portfolio[_editIdx] = card; }
+      else                   { c.portfolio.push(card); }
+      save(c); renderCardList(c.portfolio); closeModal();
+    }
+
+    // Close modal on Escape
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // ── EXPORT / IMPORT ──────────────────────────────────────────────
+    function doExport() {
+      const blob = new Blob([JSON.stringify(load(), null, 2)], { type: 'application/json' });
+      const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'acy-content.json' });
+      a.click();
+    }
+
+    function doImport(e) {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const content = JSON.parse(ev.target.result);
+          localStorage.setItem(KEY, JSON.stringify(content));
+          initAdmin();
+        } catch { alert('Invalid JSON file — please export a backup from this admin first.'); }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+  </script>
+
+</body>
+</html>
